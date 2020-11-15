@@ -10,6 +10,3 @@ linePlot = new LinePlot(alpha, beta);
 // make slider panel to control other plots
 sliderWindow = new SliderWindow(alpha, beta, sampleSize, drawSize, linePlot)
 
-
-
-console.log(sliderWindow)

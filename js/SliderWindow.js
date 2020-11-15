@@ -20,16 +20,16 @@ class SliderWindow {
 
         var that = this;
 
-        let distScale = d3.scaleLinear().domain([0, 8]).range([0, 100]);
+        let distScale = d3.scaleLinear().domain([0, 5]).range([0, 100]);
 
         // appending alpha slider
         let alphaSlider = d3.select("#alpha_slider")
             .append('div').classed('slider_wrap', true).attr('id', 'alpha_slider_wrap')
             .append('input').classed('slider', true)
             .attr('type', 'range')
-            .attr('min', 0.1)
-            .attr('max', 8)
-            .attr('step', .01)
+            .attr('min', 0.01)
+            .attr('max', 5)
+            .attr('step', .1)
             .attr('value', that.activeAlpha);
         
         // appending svg for slider label
@@ -50,7 +50,7 @@ class SliderWindow {
             alphaSliderText.attr('x', distScale(this.value));
             that.activeAlpha = +this.value;
             
-            that.linePlot.updatePlot(that.activeAlpha, that.activeBeta);
+            that.linePlot.sliderUpdate(that.activeAlpha, that.activeBeta);
 
         })
 
@@ -60,7 +60,7 @@ class SliderWindow {
             .append('input').classed('slider', true)
             .attr('type', 'range')
             .attr('min', 0.1)
-            .attr('max', 8)
+            .attr('max', 5)
             .attr('step', .01)
             .attr('value', that.activeBeta);
         
@@ -82,7 +82,7 @@ class SliderWindow {
             betaSliderText.attr('x', distScale(this.value));
             that.activeBeta = +this.value;
             
-            that.linePlot.updatePlot(that.activeAlpha, that.activeBeta);
+            that.linePlot.sliderUpdate(that.activeAlpha, that.activeBeta);
         })
 
         // appending sample slider
