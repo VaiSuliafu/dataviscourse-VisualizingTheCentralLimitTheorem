@@ -2,19 +2,16 @@
 class SliderWindow {
 
     /** 
-     * Creates a new SliderWindow Object
+     * Creates a new SliderWindow object
      */
-    constructor(activeAlpha, activeBeta, activeSample, activeDraw) {
-        this.activeAlpha = activeAlpha
-        this.activeBeta = activeBeta
-        this.activeSample = activeSample
-        this.activeDraw = activeDraw
-        this.drawSliders()
-    }
-
-    play() {
-        console.log('play')
-    }
+    constructor(activeAlpha, activeBeta, activeSample, activeDraw, linePlot) {
+        this.activeAlpha = activeAlpha;
+        this.activeBeta = activeBeta;
+        this.activeSample = activeSample;
+        this.activeDraw = activeDraw;
+        this.linePlot = linePlot;
+        this.drawSliders();
+    };
 
     /**
      * Draws the sliders
@@ -23,22 +20,23 @@ class SliderWindow {
 
         var that = this;
 
-        let distScale = d3.scaleLinear().domain([0, 100]).range([0, 100]);
+        let distScale = d3.scaleLinear().domain([0, 8]).range([0, 100]);
 
         // appending alpha slider
         let alphaSlider = d3.select("#alpha_slider")
             .append('div').classed('slider_wrap', true).attr('id', 'alpha_slider_wrap')
             .append('input').classed('slider', true)
             .attr('type', 'range')
-            .attr('min', 0)
-            .attr('max', 100)
+            .attr('min', 0.1)
+            .attr('max', 8)
+            .attr('step', .01)
             .attr('value', that.activeAlpha);
         
         // appending svg for slider label
         let alphaSliderLabel = d3.select('#alpha_slider_wrap')
             .append('div').classed('slider-label', true)
             .append('svg')
-            .attr('height', 20);;
+            .attr('height', 20);
 
         // appending slider label
         let alphaSliderText = alphaSliderLabel.append('text')
@@ -51,8 +49,9 @@ class SliderWindow {
             alphaSliderText.text(this.value);
             alphaSliderText.attr('x', distScale(this.value));
             that.activeAlpha = +this.value;
-            //TODO
-            // make it call update plot functions
+            
+            that.linePlot.updatePlot(that.activeAlpha, that.activeBeta);
+
         })
 
         // appending beta slider
@@ -60,8 +59,9 @@ class SliderWindow {
             .append('div').classed('slider_wrap', true).attr('id', 'beta_slider_wrap')
             .append('input').classed('slider', true)
             .attr('type', 'range')
-            .attr('min', 0)
-            .attr('max', 100)
+            .attr('min', 0.1)
+            .attr('max', 8)
+            .attr('step', .01)
             .attr('value', that.activeBeta);
         
         // appending svg for slider label
@@ -81,8 +81,8 @@ class SliderWindow {
             betaSliderText.text(this.value);
             betaSliderText.attr('x', distScale(this.value));
             that.activeBeta = +this.value;
-            //TODO
-            // make it call update plot functions
+            
+            that.linePlot.updatePlot(that.activeAlpha, that.activeBeta);
         })
 
         // appending sample slider
@@ -145,6 +145,7 @@ class SliderWindow {
             // make it call update plot functions
         })
 
+        // add functionality to the button
         let selection = d3.select("#sample_button")
             .select('input')
             .on("click", function() {
