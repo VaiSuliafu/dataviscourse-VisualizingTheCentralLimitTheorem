@@ -10,6 +10,7 @@ text {
     fill: black;
 }
 
-.line {
-    fill: steelblue
+.area_chart {
+    fill: rgb(18, 98, 163)
 }
+
