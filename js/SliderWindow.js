@@ -4,12 +4,14 @@ class SliderWindow {
     /** 
      * Creates a new SliderWindow object
      */
-    constructor(activeAlpha, activeBeta, activeSample, activeDraw, linePlot) {
+    constructor(activeAlpha, activeBeta, activeSample, activeDraw, linePlot, histChart) {
         this.activeAlpha = activeAlpha;
         this.activeBeta = activeBeta;
         this.activeSample = activeSample;
         this.activeDraw = activeDraw;
         this.linePlot = linePlot;
+        this.histChart = histChart;
+        this.sampleData = [];
         this.drawSliders();
     };
 
@@ -21,15 +23,16 @@ class SliderWindow {
         var that = this;
 
         let distScale = d3.scaleLinear().domain([0, 5]).range([0, 100]);
+        let sampScale = d3.scaleLinear().domain([0, 100]).range([0, 100]);
 
         // appending alpha slider
         let alphaSlider = d3.select("#alpha_slider")
             .append('div').classed('slider_wrap', true).attr('id', 'alpha_slider_wrap')
             .append('input').classed('slider', true)
             .attr('type', 'range')
-            .attr('min', 0.01)
+            .attr('min', 0.1)
             .attr('max', 5)
-            .attr('step', .1)
+            .attr('step', .01)
             .attr('value', that.activeAlpha);
         
         // appending svg for slider label
@@ -103,13 +106,13 @@ class SliderWindow {
         // appending slider label
         let sampleSliderText = sampleSliderLabel.append('text')
             .text(that.activeSample)
-            .attr('x', distScale(that.activeSample))
+            .attr('x', sampScale(that.activeSample))
             .attr('y', 15);
 
         // setting the sliders input behavior
         sampleSlider.on('input', function () {
             sampleSliderText.text(this.value);
-            sampleSliderText.attr('x', distScale(this.value));
+            sampleSliderText.attr('x', sampScale(this.value));
             that.activeSample = +this.value;
             //TODO
             // make it call update plot functions
@@ -133,13 +136,13 @@ class SliderWindow {
         // appending slider label
         let drawSliderText = drawSliderLabel.append('text')
             .text(that.activeDraw)
-            .attr('x', distScale(that.activeDraw))
+            .attr('x', sampScale(that.activeDraw))
             .attr('y', 15);
 
         // setting the sliders input behavior
         drawSlider.on('input', function () {
             drawSliderText.text(this.value);
-            drawSliderText.attr('x', distScale(this.value));
+            drawSliderText.attr('x', sampScale(this.value));
             that.activeDraw = +this.value;
             //TODO
             // make it call update plot functions
@@ -149,7 +152,19 @@ class SliderWindow {
         let selection = d3.select("#sample_button")
             .select('input')
             .on("click", function() {
-                console.log(that.activeAlpha, that.activeBeta, that.activeSample, that.activeDraw);
+                let data; let mean;
+                for (let i = 0; i < that.activeDraw; i++) {
+                    data = [];
+                    for (let j = 0; j < that.activeSample; j++) {
+                        data.push(jStat.beta.sample(that.activeAlpha, that.activeBeta))
+                    };
+                    mean = d3.mean(data);
+                    that.sampleData.push(mean);
+                };
+                // TODO
+                // update histogram
+                that.histChart.updateChart(that.sampleData);
+                console.log('button')
             })
 
         

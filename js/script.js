@@ -7,6 +7,9 @@ drawSize = 1
 // render the line plot object
 linePlot = new LinePlot(alpha, beta);
 
+// render the histogram object
+histChart = new HistChart();
+
 // make slider panel to control other plots
-sliderWindow = new SliderWindow(alpha, beta, sampleSize, drawSize, linePlot)
+sliderWindow = new SliderWindow(alpha, beta, sampleSize, drawSize, linePlot, histChart)
 
