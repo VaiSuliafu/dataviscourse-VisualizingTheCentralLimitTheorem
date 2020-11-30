@@ -95,6 +95,7 @@ class SliderWindow {
             .attr('type', 'range')
             .attr('min', 0)
             .attr('max', 100)
+            .attr('step', 2)
             .attr('value', that.activeSample);
         
         // appending svg for slider label
@@ -125,6 +126,7 @@ class SliderWindow {
             .attr('type', 'range')
             .attr('min', 0)
             .attr('max', 100)
+            .attr('step', 2)
             .attr('value', that.activeDraw);
         
         // appending svg for slider label
@@ -164,7 +166,6 @@ class SliderWindow {
                 // TODO
                 // update histogram
                 that.histChart.updateChart(that.sampleData);
-                console.log('button')
             })
 
         

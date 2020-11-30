@@ -7,43 +7,41 @@ class LinePlot {
     constructor(alpha, beta) {
 
         // controls height of svg and resulting line plot
-        this.h = 350;
-        this.w = 630;
-        let topPadding = 20;
+        var margin = {top:20, right: 30, bottom:20, left:30};
+        let width = 630 - margin.left - margin.right;
+        let height = 350
+        this.height = height;
 
         // create SVG element
         let svg = d3.select("#area_chart")
             .classed("area_chart", true)
             .append("svg")
             .attr("id", "area_svg")
-            .attr("width", this.w)
-            .attr("height", this.h);
+            .attr("width", width)
+            .attr("height", height);
 
-        // scales
-        var xScale = d3.scaleLinear().domain([0,1]).range([0, this.w]);
-        var yScale = d3.scaleLinear().domain([0,3]).range([this.h, topPadding])
+        // X scales
+        var xScale = d3.scaleLinear()
+            .domain([0,1])
+            .range([margin.left, width-margin.right]);
+        svg.append("g")
+            .attr("transform", "translate(0," + String(height-18) + ")")
+            .call(d3.axisBottom(xScale))
 
-        // draws axis
-        function drawBar(selection, dy, label) {
-            var axis = selection.append("g").attr("class", "axis");
-            axis.append("line")
-                .attr("x1", xScale(0))
-                .attr("x2", xScale(1))
-                .attr("y1", dy)
-                .attr("y2", dy);
-            axis.append("text")
-                .attr("x", xScale(0))
-                .attr("y", dy)
-                .attr("dy", "1em")
-                .text(label)
-        };
+        // Y scale
+        var yScale = d3.scaleLinear()
+            .domain([0,3])
+            .range([height-margin.bottom, margin.top])
 
-        // axis bar
-        svg.call(drawBar, this.h, "Theoretical")
+        // line path
+        var samplingPath = svg.append("path")
+            .attr("id", "pdf")
+            .attr("transform", "translate(0, -20)");
 
-        // path and area elements
-        var samplingPath = svg.append("path").attr("id", "pdf");
-        var samplingArea = svg.append("path").attr("id", "pdfArea")
+        // area path
+        var samplingArea = svg.append("path")
+            .attr("id", "pdfArea")
+            .attr("transform", "translate(0, -20)")
 
         // line generator function
         this.line = d3.line()
@@ -55,7 +53,7 @@ class LinePlot {
         this.area = d3.area()
             .curve(d3.curveBasis)
             .x(function(d) { return xScale(d[0])})
-            .y0(this.h)
+            .y0(height)
             .y1(function(d) { return yScale(d[1])})
 
         // generate x,y data
@@ -70,9 +68,16 @@ class LinePlot {
      * Updates the data given new parameters for alpha and beta
      */
     updateData(alpha, beta) {
+
+        // get the distribution 
         var datum = d3.range(0, 1.05, 0.05).map(function(x) {
             return [x, Math.min(jStat.beta.pdf(x, alpha, beta), 10)];
-        })
+        });
+
+        // makes the lines connect
+        datum.unshift([0,0]);
+        datum.push([1,0]);
+
         return datum;
     }
 
