@@ -95,7 +95,7 @@ class SliderWindow {
             .append('input').classed('slider', true)
             .attr('type', 'range')
             .attr('min', 0)
-            .attr('max', 100)
+            .attr('max', 10)
             .attr('step', 2)
             .attr('value', that.activeSample);
         
@@ -126,7 +126,7 @@ class SliderWindow {
             .append('input').classed('slider', true)
             .attr('type', 'range')
             .attr('min', 0)
-            .attr('max', 100)
+            .attr('max', 50)
             .attr('step', 2)
             .attr('value', that.activeDraw);
         
@@ -166,7 +166,7 @@ class SliderWindow {
                 };
 
                 // Update the statistics panel
-                that.statPanel.updatePanel(that.sampleData);
+                that.statPanel.updatePanel(that.sampleData, that.activeAlpha, that.activeBeta);
                 
                 // Update the histrogram
                 that.histChart.updateChart(that.sampleData);
