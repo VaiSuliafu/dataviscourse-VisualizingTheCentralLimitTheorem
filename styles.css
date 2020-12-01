@@ -18,3 +18,12 @@ rect {
     fill: rgb(18, 98, 163)
 }
 
+.panel_title {
+    font-size: 22px;
+    font-weight: bold
+}
+
+.panel_text {
+    font-size: 22px;
+}
+
