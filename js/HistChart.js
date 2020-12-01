@@ -60,7 +60,7 @@ class HistChart {
         // Convert to histogram data
         data = this.histogram(data);
 
-        let yMax = d3.max(data.map(function(d) { return d.x1;}));
+        let yMax = d3.max(data.map(function(d) { return d.length;}));
 
         // Y axis: scale and draw
         let yScale = d3.scaleLinear()
@@ -69,7 +69,7 @@ class HistChart {
         d3.select("#histogram_svg")
             .append("g")
             .attr("transform", "translate(" + that.margin.left + ",0)")
-            .call(d3.axisLeft(yScale));
+            // .call(d3.axisLeft(yScale));
 
         // enter bars
         let barGroup = d3.select("#histogram_svg")
@@ -78,37 +78,27 @@ class HistChart {
             .join()
             .data(data)
             .join("g")
-            .classed("bar", true);
-
-        barGroup.append("rect");
-        barGroup.append("text")
-            // .attr("y", that.h - 15)
-            .attr("text-anchor", "middle");
-
-
-        // barGroup.select("rect")
-        //     .attr("x", function(d) {
-        //         return that.xScale(d.x0) + 1;
-        //     })
-        //     .attr("width", function(d) {
-        //         return 25;
-        //         // return that.xScale(d.x0);
-        //     })
-        //     .attr("y", function(d) {
-        //         return that.yScale(d.x1*that.bins)
-        //     })
-        //     .attr("height", function(d) {
-        //         return 330 - that.yScale(d.x1*that.bins);
-        //     })
-        //     .attr("fill", "black")
-        
-        // barGroup.select("text")
-        //     .attr("x", function(d) {
-        //         return that.xScale(d.x0 + 1/(2*that.bins));
-        //     })
-        //     .text(function(d) { 
-        //         return d.x1 > 0 ? d3.format("%")(d.x1) : "";
-        //     }); 
+            .classed("bar", true)
+                .append("rect")
+                .attr("x", 1)
+                .attr("transform", function(d) {
+                    return "translate(" + that.xScale(d.x0) + "," + yScale(d.length) + ")";
+                })
+                .attr("width", function(d) {
+                    return that.xScale(d.x1) - that.xScale(d.x0);
+                })
+                .attr("height", function(d) {
+                    return that.height - that.margin.bottom - yScale(d.length);
+                })
+                .attr("stroke", "White")
+                .attr("stroke-width", function(d) {
+                    return 1;
+                })
+                    .append("text")
+                    .attr("y", function(d) {
+                        return yScale(d.length);
+                    })
+                    .attr("text-anchor", "middle");
         
     }
 }
