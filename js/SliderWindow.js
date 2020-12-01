@@ -4,13 +4,14 @@ class SliderWindow {
     /** 
      * Creates a new SliderWindow object
      */
-    constructor(activeAlpha, activeBeta, activeSample, activeDraw, linePlot, histChart) {
+    constructor(activeAlpha, activeBeta, activeSample, activeDraw, linePlot, histChart, statPanel) {
         this.activeAlpha = activeAlpha;
         this.activeBeta = activeBeta;
         this.activeSample = activeSample;
         this.activeDraw = activeDraw;
         this.linePlot = linePlot;
         this.histChart = histChart;
+        this.statPanel = statPanel;
         this.sampleData = [];
         this.drawSliders();
     };
@@ -163,8 +164,11 @@ class SliderWindow {
                     mean = d3.mean(data);
                     that.sampleData.push(mean);
                 };
-                // TODO
-                // update histogram
+
+                // Update the statistics panel
+                that.statPanel.updatePanel(that.sampleData);
+                
+                // Update the histrogram
                 that.histChart.updateChart(that.sampleData);
             })
 
@@ -172,4 +176,4 @@ class SliderWindow {
 
     }
 
-}
+} 

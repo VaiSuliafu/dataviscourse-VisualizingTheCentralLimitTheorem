@@ -10,6 +10,9 @@ linePlot = new LinePlot(alpha, beta);
 // render the histogram object
 histChart = new HistChart();
 
+// render the statistics panel object
+statPanel = new StatPanel(histChart.histogram);
+
 // make slider panel to control other plots
-sliderWindow = new SliderWindow(alpha, beta, sampleSize, drawSize, linePlot, histChart)
+sliderWindow = new SliderWindow(alpha, beta, sampleSize, drawSize, linePlot, histChart, statPanel)
 
