@@ -1,21 +1,33 @@
 .view {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
-    grid-template-areas: "a b c"
-                         "a d c"
 }
 
 text {
-    fill: black;
+    fill: black
 }
 
 .area_chart {
-    fill: rgb(18, 98, 163)
+    fill: firebrick;
 }
 
 rect {
-    fill: rgb(18, 98, 163)
+    fill: firebrick;
+    stroke: black;
+    stroke-width: 1;
+}
+
+.sample_path {
+    fill: none;
+    stroke: firebrick;
+    stroke-width:3;
+}
+
+.theo_path {
+    fill: none;
+    stroke: black;
+    stroke-width:4;
 }
 
 .panel_title {
@@ -23,7 +35,13 @@ rect {
     font-weight: bold
 }
 
-.panel_text {
+.panel_text_black {
     font-size: 22px;
+    fill: black;
+}
+
+.panel_text_red {
+    font-size: 22px;
+    fill: firebrick
 }
 
