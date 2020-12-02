@@ -11,6 +11,7 @@ class EcdfChart {
        let width = 700 - margin.left - margin.right;
        let height = 350
        this.height = height;
+       var that = this;
   
        // create SVG element
        let svg = d3.select("#ecdf_plot")
@@ -55,6 +56,24 @@ class EcdfChart {
             .curve(d3.curveBasis)
             .x(function(d) { return xScale(d[0])})
             .y(function(d) { return yScale(d[1])})
+
+        // legend text
+        svg.append("text")
+            .attr("x", width - 100)
+            .attr("y", height - 60)
+            .style("fill", "Black")
+            .text("Theoretical")
+            .style("font-size", "20")
+            .style("font-weight", "bold")
+
+        svg.append("text")
+            .attr("x", width - 100)
+            .attr("y", height - 40)
+            .style("fill", "Firebrick")
+            .text("Observed")
+            .style("font-size", 20)
+            .style("font-weight", "bold")
+
   
      }
   
