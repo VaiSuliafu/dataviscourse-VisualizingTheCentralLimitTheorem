@@ -1,76 +1,104 @@
+/**
+ * Class representing Empirical Cumulative Distribution Function
+ */
 class EcdfChart {
-  /**
-   * Creates a new LinePlot object
-   */
-   constructor(data) {
-     // controls height of svg and resulting line plot
-     var margin = {top:20, right: 30, bottom:20, left:30};
-     let width = 630 - margin.left - margin.right;
-     let height = 350
-     this.height = height;
+    /**
+     * Creates a new ECDF Function
+     */
+     constructor() {
+       // controls height of svg and resulting line plot
+       var margin = {top:20, right: 30, bottom:20, left:30};
+       let width = 700 - margin.left - margin.right;
+       let height = 350
+       this.height = height;
+  
+       // create SVG element
+       let svg = d3.select("#ecdf_plot")
+           .classed("ecdf_plot", true)
+           .append("svg")
+           .attr("id", "ecdf_svg")
+           .attr("width", width)
+           .attr("height", height);
+  
+       // X scales
+       var xScale = d3.scaleLinear()
+           .domain([0,1])
+           .range([margin.left, width-margin.right]);
+       svg.append("g")
+           .attr("transform", "translate(0," + String(height-18) + ")")
+           .call(d3.axisBottom(xScale));
+  
+       // Y scale
+       var yScale = d3.scaleLinear()
+           .domain([0,1])
+           .range([height-margin.bottom, margin.top]);
+       svg.append("g")
+          .attr("transform", "translate(0," + String(width) + ")")
+          .call(d3.axisLeft(yScale));
 
-     // create SVG element
-     let svg = d3.select("ecdf_plot")
-         .classed("ecdf_plot", true)
-         .append("svg")
-         .attr("id", "ecdf_svg")
-         .attr("width", width)
-         .attr("height", height);
+        // line paths
+        var samplePath = svg.append("path")
+            .attr("class", "sample_path")
+            .attr("transform", "translate(0, -20)");
 
-     // X scales
-     var xScale = d3.scaleLinear()
-         .domain([0,1])
-         .range([margin.left, width-margin.right]);
-     svg.append("g")
-         .attr("transform", "translate(0," + String(height-18) + ")")
-         .call(d3.axisBottom(xScale));
+        var theoPath = svg.append("path")
+            .attr("class", "theo_path")
+            .attr("transform", "translate(0, -20)");
 
-     // Y scale
-     var yScale = d3.scaleLinear()
-         .domain([0,1])
-         .range([height-margin.bottom, margin.top]);
-     svg.append("g")
-        .attr("transform", "translate(0," + String(width) + ")")
-        .call(d3.axisLeft(yScale));
+        // line generating functions
+        this.sample_line = d3.line()
+            .curve(d3.curveBasis)
+            .x(function(d) { return xScale(d[0])})
+            .y(function(d) { return yScale(d[1])})
 
-   }
-
-   updateECDF(data) {
-     let that = this;
-
-     // convert array of means to array of (mean, cumulative frequency)
-     let sorted = data.sort((a, b) => a-b);
-     let ecdfData = [];
-     const arrSum = arr => arr.reduce((a,b) => a + b, 0);
-     let total = arrSum(data);
-     ecdfData.push([sorted[0], sorted[0]/total]);
-     for (let i = 1; i < data.length; i++) {
-       ecdfData.push([sorted[i], (sorted[i] + ecdfData[i-1][1])]);
+        this.theo_line = d3.line()
+            .curve(d3.curveBasis)
+            .x(function(d) { return xScale(d[0])})
+            .y(function(d) { return yScale(d[1])})
+  
      }
-     for (let i = 0; i < data.length; i++) {
-       ecdfData[i][1] /= total;
+  
+     updatePlot(observed, expectations) {
+
+
+       let that = this;
+
+       // format the data
+       let data = this.updateData(observed, expectations);
+
+       // select the path elements
+       var samplePath = d3.select(".sample_path")
+       var theoPath = d3.select(".theo_path")
+
+       // update the datum objects for each path
+       samplePath.datum(data[0]).attr("d", that.sample_line)
+       theoPath.datum(data[1]).attr("d", that.theo_line);
+  
      }
-     console.log(sorted);
-     console.log(ecdfData);
 
-     // todo: update line Chart
-     this.line = d3.line()
-         .curve(d3.curveBasis)
-         .x(function(d) { return xScale(d[0])})
-         .y(function(d) { return yScale(d[1])});
-
-   }
-
-   // update theoretical cdf from beta distribution
-   updateTheoretical(alpha, beta) {
-     let mean = jStat.beta.mean( alpha, beta );
-     let std = jStat.beta.variance( alpha, beta );
-
-     var datum = d3.range(0, 1.05, 0.05).map(function(x) {
-         return jStat.normal.cdf(x, mean, std);
-     });
-
-     return datum;
-   }
-
-}
+     /**
+      * Formats the data for the ECDF plot
+      */
+     updateData(observed, expectations) {
+         
+        // observed x values
+        let x_observed = observed.sort();
+ 
+        // normalized y values
+        let sample = d3.range(1, x_observed.length+1, 1).map(function(i) {
+            return [x_observed[i-1], i / x_observed.length];
+        });
+ 
+        // theoretical x values
+        let x_theo = expectations.sort();
+ 
+        // normalized theoretical y values
+        let theo = d3.range(1, x_theo.length+1, 1).map(function(i) {
+            return [x_theo[i-1], i / x_theo.length];
+        });
+ 
+        // return results
+        return [sample, theo];
+      }
+  
+  }

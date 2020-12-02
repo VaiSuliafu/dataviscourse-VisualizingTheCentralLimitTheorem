@@ -8,7 +8,7 @@ class LinePlot {
 
         // controls height of svg and resulting line plot
         var margin = {top:20, right: 30, bottom:20, left:30};
-        let width = 630 - margin.left - margin.right;
+        let width = 700 - margin.left - margin.right;
         let height = 350
         this.height = height;
 
@@ -78,6 +78,7 @@ class LinePlot {
         datum.unshift([0,0]);
         datum.push([1,0]);
 
+        // return results
         return datum;
     }
 
@@ -85,10 +86,13 @@ class LinePlot {
      * Updates the sampling distribution
      */
     updatePlot(datum) {
+
         let that = this;
+
         // select the path elements
         var samplingPath = d3.select("#pdf")
         var samplingArea = d3.select("#pdfArea")
+        
         // update sampling distribution
         samplingPath.datum(datum).attr("d", that.line);
         samplingArea.datum(datum).attr("d", that.area);

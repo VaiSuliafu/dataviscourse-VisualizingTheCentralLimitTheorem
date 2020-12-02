@@ -12,7 +12,7 @@ class HistChart {
 
         // controls height of svg and resulting line plot
         var margin = {top:20, right: 30, bottom:20, left:30}
-        let width = 630 - margin.left - margin.right;
+        let width = 700 - margin.left - margin.right;
         let height = 350
         this.height = height
         this.margin = margin;
@@ -89,10 +89,6 @@ class HistChart {
                 })
                 .attr("height", function(d) {
                     return that.height - that.margin.bottom - yScale(d.length);
-                })
-                .attr("stroke", "White")
-                .attr("stroke-width", function(d) {
-                    return 1;
                 })
                     .append("text")
                     .attr("y", function(d) {

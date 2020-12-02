@@ -10,9 +10,8 @@ linePlot = new LinePlot(alpha, beta);
 // render the histogram object
 histChart = new HistChart();
 
-// render the statistics panel object
-statPanel = new StatPanel(histChart.histogram);
+// render the ECDF objecty
+ecdfChart = new EcdfChart();
 
 // make slider panel to control other plots
-sliderWindow = new SliderWindow(alpha, beta, sampleSize, drawSize, linePlot, histChart, statPanel)
-
+sliderWindow = new SliderWindow(alpha, beta, sampleSize, drawSize, linePlot, histChart, ecdfChart)

@@ -9,7 +9,7 @@ class StatPanel {
 
         // controls height of svg and resulting line plot
         var margin = {top:20, right: 30, bottom:20, left:30}
-        let width = 630 - margin.left - margin.right;
+        let width = 700 - margin.left - margin.right;
         let height = 350
         this.height = height
         this.margin = margin;
@@ -22,8 +22,8 @@ class StatPanel {
             .classed("panel", true)
             .append("svg")
             .attr("id", "panel_svg")
-            .attr("width", width)
-            .attr("height", height);
+            .attr("width", "100%")
+            .attr("height", "100%");
 
         svg.append("text")
             .classed("panel_title", true)
@@ -57,66 +57,96 @@ class StatPanel {
         };
     }
 
+    calcZScore(x, mu, sigma) {
+        return (x - mu) / Math.max(sigma,0.000000001);
+    }
+
+    updateStats(N, mu, sigma) {
+
+        let that = this;
+
+        // cut off vlaues for binning
+        let bins = d3.range(0, 1.05, 0.05);
+
+        // empty array to store expected probabilities for each bin
+        let e_arr = new Array(22).fill(0);
+
+        // compute expected values
+        let z_score = null;
+        let z_score2 = null;
+
+        for (let i = 0; i < e_arr.length; i++) {
+            if (i == 0) {
+                z_score = that.calcZScore(0.0, mu, sigma);
+                e_arr[i] = N * jStat.normal.cdf(z_score, 0, 1);
+            }
+            else if (i == e_arr.length-1) {
+                z_score = that.calcZScore(1.0, mu, sigma);
+                e_arr[i] = N * (1 - jStat.normal.cdf(z_score, 0, 1));
+            }
+            else {
+                z_score = that.calcZScore(bins[i], mu, sigma);
+                z_score2 = that.calcZScore(bins[i-1], mu, sigma);
+                e_arr[i] = N * (jStat.normal.cdf(z_score, 0, 1) - jStat.normal.cdf(z_score2, 0, 1));
+            }
+        }
+
+        // return array of expected values
+        return e_arr
+    }
+
     /**
      * Updates the display panel with new sample data 
      */
-    updatePanel(observations, alpha, beta) {
+    updatePanel(observations, mu, sigma) {
 
         // number of observations
         var N = observations.length;
 
-        // calculate new theoretical normal
-        let expectations = this.calcTheoSample(N, alpha, beta);
-
-        // console.log(expectations)
+        // get expected values
+        let expectations = this.updateStats(N, mu, sigma);
 
         // bin the data
         let b_observations = this.histogram(observations)
-        let b_expectations = this.histogram(expectations)
 
         // calculate test statistic
-        this.calcChiSquaredTestStat(b_observations, b_expectations);
-
-
+        this.calcChiSquaredTestStat(b_observations, expectations);
 
         // degrees of freedom
-        let dof = Math.max(1, N-1)
-
+        let dof = observations.length - 3;
 
         // p value
         let probability = 1 - jStat.chisquare.cdf(this.results.testStat, dof);
-
-        
-        console.log("Degrees of Freedom: " + dof)
-        console.log("Stat: " + this.results.testStat);
-        console.log("Pval : " + probability)
 
         // svg
         let panelSvg = d3.select("#panel_svg")
         
         // remove prior text
         panelSvg
-            .selectAll(".panel_text")
-            .remove()
+            .selectAll(".panel_text_black")
+            .remove();
+        panelSvg
+            .selectAll(".panel_text_red")
+            .remove();
 
         // draws text
         panelSvg
             .append("text")
-            .classed("panel_text", true)
+            .classed("panel_text_black", true)
             .attr("x", "90")
             .attr("y", "20")
             .text(N)
 
         panelSvg
             .append("text")
-            .classed("panel_text", true)
+            .classed("panel_text_black", true)
             .attr("x", "260")
             .attr("y", "80")
             .text(this.results.testStat)
 
         panelSvg
             .append("text")
-            .classed("panel_text", true)
+            .classed("panel_text_black", true)
             .attr("x", "205")
             .attr("y", "140")
             .text(dof)
@@ -125,50 +155,16 @@ class StatPanel {
         // p value text
         panelSvg
             .append("text")
-            .classed("panel_text", true)
+            .attr("class", function() {
+                if (probability < 0.05) {
+                    return "panel_text_red";
+                } else {
+                    return "panel_text_black";
+                }
+            })
             .attr("x", "100")
             .attr("y", "200")
             .text(probability)
-    }
-
-    /**
-     * Calculates a sample for the theoretical normal distribution
-    */
-    calcTheoSample(N, alpha, beta) {
-        
-        // estimate mean parameter from observations
-        // let mu = 0;
-        // for (let o of observations) {
-        //     mu += o;
-        // }
-        // mu /= observations.length;
-
-        let mu = jStat.beta.mean(alpha, beta)
-
-        // estimate the std from observations
-        // let v = 0;
-        // for (let o of observations) {
-        //     v += (mu - o)**2;
-        // }
-
-        let v = jStat.beta.variance(alpha, beta)
-
-        // calculate a normal sample with estimated parameters
-        var expectations = []
-        let theo_o = null;
-        for (let i = 0; i < N; i++) {
-            theo_o = jStat.normal.sample(mu, v**0.5);
-            // rounding continuous values to interval bins
-            if (theo_o < 0) {
-                theo_o = 0;
-            };
-            if (theo_o > 1) {
-                theo_o = 1
-            };
-            expectations.push(theo_o)
-        }
-
-        return expectations;
     }
 
     /**
@@ -183,15 +179,10 @@ class StatPanel {
         // Clear prior results
         this.clearResults();
 
-        // console.log("Observations")
-        // console.log(observations)
-        // console.log("Expectations")
-        // console.log(expectations)
-
         // Iterate the chi-squared procedure for each term
         for (let i = 0; i < observations.length; i++) {
             let thisTerm = this.calcSingleTerm(observations[i], expectations[i]);
-            that.results.terms.push(thisTerm);
+            // that.results.terms.push(thisTerm);
             that.results.testStat += thisTerm;
         }
 
@@ -202,13 +193,14 @@ class StatPanel {
      * Calculates one iteration of the Chi-squared test procedure
      */
     calcSingleTerm(observed, expected) {
-        if (expected.length == 0) {
+        if (expected == 0) {
             return 0;
         }
-        let x = Math.pow(observed.length - expected.length, 2) / expected.length;
-        // console.log("Observed: " + observed)
-        // console.log("Expected: " + expected)
-        // console.log(x)
+        // console.log(observed)
+        console.log("Difference: " + Math.abs(observed.length - expected))
+        // console.log("Observed Count: " + observed.length)
+        // console.log("Expected Count: " + expected)
+        let x = Math.pow(observed.length - expected, 2) / expected;
         return x;
     }
 
