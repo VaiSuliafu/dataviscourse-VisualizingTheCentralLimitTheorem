@@ -79,6 +79,18 @@ class EcdfChart {
   
      updatePlot(observed, expectations) {
 
+       let svg = d3.select("#ecdf_svg");
+
+       svg.select(".draw_label").remove();
+
+       svg.append("text")
+          .classed("draw_label", true)
+          .attr("x", 0)
+          .attr("y", 30)
+          .style("font-size", 40)
+          .style("fill", "light-gray")
+          .text("N = " + observed.length)
+
 
        let that = this;
 
