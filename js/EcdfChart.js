@@ -67,7 +67,7 @@ class EcdfChart {
      let std = jStat.beta.variance( alpha, beta );
 
      var datum = d3.range(0, 1.05, 0.05).map(function(x) {
-         return [x, Math.min(jStat.normal.cdf(x, mean, std), 10)];
+         return jStat.normal.cdf(x, mean, std);
      });
 
      return datum;
