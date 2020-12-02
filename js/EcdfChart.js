@@ -58,6 +58,14 @@ class EcdfChart {
             .y(function(d) { return yScale(d[1])})
 
         // legend text
+    svg.append("text")
+        .classed("draw_label", true)
+        .attr("x", 0)
+        .attr("y", 30)
+        .style("font-size", 40)
+        .style("fill", "light-gray")
+        .text("N = " + 0)
+
         svg.append("text")
             .attr("x", width - 100)
             .attr("y", height - 60)
