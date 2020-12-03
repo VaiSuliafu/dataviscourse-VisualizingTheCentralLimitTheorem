@@ -11,9 +11,7 @@ Our code can be found in the .js file. We have a .js script for each view. We al
 All data is generated in browser.
 
 ## Project Website
-[Website]
-(https://vaisuliafu.github.io/dataviscourse-VisualizingTheCentralLimitTheorem/)
+[Website](https://vaisuliafu.github.io/dataviscourse-VisualizingTheCentralLimitTheorem/)
 
 ## Screencast
-[YouTube]
-(https://www.youtube.com/watch?v=RDMKx-tn5kY&feature=youtu.be)
+[YouTube](https://www.youtube.com/watch?v=RDMKx-tn5kY&feature=youtu.be)
